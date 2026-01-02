@@ -1,0 +1,2279 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Monitoring System</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+      }
+
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        background: white;
+        min-height: 100vh;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+      }
+
+      /* Header */
+      header {
+        background: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
+        color: white;
+        padding: 1rem 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .logo i {
+        font-size: 2rem;
+      }
+
+      .logo h1 {
+        font-size: 1.5rem;
+      }
+
+      .system-time {
+        text-align: right;
+      }
+
+      /* Main Layout */
+      .main-content {
+        display: flex;
+        min-height: calc(100vh - 80px);
+      }
+
+      /* Sidebar */
+      .sidebar {
+        width: 250px;
+        background: #2c3e50;
+        padding: 1rem 0;
+      }
+
+      .sidebar ul {
+        list-style: none;
+      }
+
+      .sidebar li {
+        padding: 1rem 2rem;
+        color: white;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        transition: all 0.3s;
+        border-left: 4px solid transparent;
+      }
+
+      .sidebar li:hover {
+        background: #34495e;
+      }
+
+      .sidebar li.active {
+        background: #1a252f;
+        border-left: 4px solid #4cc9f0;
+      }
+
+      /* Content Area */
+      .content-area {
+        flex: 1;
+        padding: 2rem;
+        overflow-y: auto;
+      }
+
+      .tab-content {
+        display: none;
+      }
+
+      .tab-content.active {
+        display: block;
+        animation: fadeIn 0.5s;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      /* Dashboard Cards */
+      .dashboard-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin: 2rem 0;
+      }
+
+      .card {
+        background: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        border: 1px solid #e9ecef;
+      }
+
+      .card-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.5rem;
+      }
+
+      .card-info h3 {
+        font-size: 2rem;
+        color: #2c3e50;
+      }
+
+      .card-info p {
+        color: #6c757d;
+      }
+
+      /* Camera Section */
+      .camera-container {
+        background: white;
+        border-radius: 10px;
+        padding: 2rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-top: 1rem;
+      }
+
+      .video-wrapper {
+        width: 100%;
+        height: 500px;
+        background: #2c3e50;
+        border-radius: 10px;
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+        position: relative;
+      }
+
+      #video-feed {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .video-placeholder {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: white;
+      }
+
+      .camera-controls {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+      }
+
+      /* Upload Section */
+      .upload-container {
+        background: white;
+        border-radius: 10px;
+        padding: 2rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .upload-area {
+        border: 3px dashed #4361ee;
+        border-radius: 10px;
+        padding: 3rem;
+        text-align: center;
+        margin-bottom: 2rem;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+
+      .upload-area:hover {
+        background: #f8f9fa;
+        border-color: #3a56d4;
+      }
+
+      .upload-area i {
+        font-size: 3rem;
+        color: #4361ee;
+        margin-bottom: 1rem;
+      }
+
+      .preview-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        margin-top: 2rem;
+      }
+
+      .image-preview,
+      .results-container {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 1.5rem;
+        min-height: 300px;
+      }
+
+      .image-preview img {
+        max-width: 100%;
+        max-height: 250px;
+        border-radius: 5px;
+      }
+
+      /* Results Display */
+      .result-item {
+        background: white;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        border-left: 4px solid #28a745;
+      }
+
+      .result-item.has-issues {
+        border-left-color: #dc3545;
+      }
+
+      .violation {
+        display: inline-block;
+        background: #fee;
+        color: #dc3545;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        margin: 0.25rem;
+        font-size: 0.85rem;
+      }
+
+      /* Tables */
+      .table-container {
+        background: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        overflow-x: auto;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th {
+        background: #4361ee;
+        color: white;
+        padding: 1rem;
+        text-align: left;
+      }
+
+      td {
+        padding: 1rem;
+        border-bottom: 1px solid #dee2e6;
+      }
+
+      tr:hover {
+        background: #f8f9fa;
+      }
+
+      /* Buttons */
+      .btn {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s;
+      }
+
+      .btn-primary {
+        background: #4361ee;
+        color: white;
+      }
+
+      .btn-primary:hover {
+        background: #3a56d4;
+      }
+
+      .btn-success {
+        background: #28a745;
+        color: white;
+      }
+
+      .btn-danger {
+        background: #dc3545;
+        color: white;
+      }
+
+      .btn-warning {
+        background: #ffc107;
+        color: #212529;
+      }
+
+      .btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      /* Modal */
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .modal.active {
+        display: flex;
+      }
+
+      .modal-content {
+        background: white;
+        border-radius: 10px;
+        width: 500px;
+        max-width: 90%;
+        max-height: 90vh;
+        overflow-y: auto;
+      }
+
+      .modal-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid #dee2e6;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #4361ee;
+        color: white;
+        border-radius: 10px 10px 0 0;
+      }
+
+      .modal-body {
+        padding: 1.5rem;
+      }
+
+      .close-modal {
+        cursor: pointer;
+        font-size: 1.5rem;
+      }
+
+      /* Forms */
+      .form-group {
+        margin-bottom: 1.5rem;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+      }
+
+      .form-group input,
+      .form-group select {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ced4da;
+        border-radius: 5px;
+        font-size: 1rem;
+      }
+
+      .form-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+        margin-top: 2rem;
+      }
+
+      /* Toast */
+      .toast {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: white;
+        padding: 1rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        z-index: 2000;
+        animation: slideIn 0.3s;
+      }
+
+      .toast.success {
+        border-left: 4px solid #28a745;
+      }
+
+      .toast.error {
+        border-left: 4px solid #dc3545;
+      }
+
+      .toast.info {
+        border-left: 4px solid #17a2b8;
+      }
+
+      @keyframes slideIn {
+        from {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        .main-content {
+          flex-direction: column;
+        }
+
+        .sidebar {
+          width: 100%;
+          padding: 0;
+        }
+
+        .sidebar ul {
+          display: flex;
+          overflow-x: auto;
+        }
+
+        .sidebar li {
+          white-space: nowrap;
+          padding: 1rem;
+        }
+
+        .video-wrapper {
+          height: 300px;
+        }
+
+        .preview-container {
+          grid-template-columns: 1fr;
+        }
+
+        .camera-controls {
+          flex-direction: column;
+        }
+
+        .btn {
+          width: 100%;
+          justify-content: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Header -->
+      <header>
+        <div class="logo">
+          <i class="fas fa-graduation-cap"></i>
+          <div>
+            <h1>Student Monitoring System</h1>
+            <p>AI-Powered Grooming & DressCode Analysis</p>
+          </div>
+        </div>
+        <div class="system-time">
+          <div id="current-date"></div>
+          <div id="current-time"></div>
+        </div>
+      </header>
+
+      <!-- Main Content -->
+      <div class="main-content">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+          <ul>
+            <li class="active" data-tab="dashboard">
+              <i class="fas fa-tachometer-alt"></i> Dashboard
+            </li>
+            <li data-tab="camera"><i class="fas fa-camera"></i> Live Camera</li>
+            <li data-tab="upload">
+              <i class="fas fa-upload"></i> Upload Photo
+            </li>
+            <li data-tab="students"><i class="fas fa-users"></i> Students</li>
+            <!-- <li data-tab="attendance">
+              <i class="fas fa-clipboard-check"></i> Attendance
+            </li>
+            <li data-tab="reports"><i class="fas fa-chart-bar"></i> Reports</li> -->
+          </ul>
+        </nav>
+
+        <!-- Content Area -->
+        <div class="content-area">
+          <!-- Dashboard Tab -->
+          <div id="dashboard" class="tab-content active">
+            <h2><i class="fas fa-tachometer-alt"></i> Dashboard</h2>
+            <div class="dashboard-cards">
+              <div class="card">
+                <div class="card-icon" style="background: #4361ee">
+                  <i class="fas fa-users"></i>
+                </div>
+                <div class="card-info">
+                  <h3 id="total-students">0</h3>
+                  <p>Total Students</p>
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-icon" style="background: #28a745">
+                  <i class="fas fa-user-check"></i>
+                </div>
+                <div class="card-info">
+                  <h3 id="present-today">0</h3>
+                  <p>Present Today</p>
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-icon" style="background: #4cc9f0">
+                  <i class="fas fa-star"></i>
+                </div>
+                <div class="card-info">
+                  <h3 id="well-groomed">0</h3>
+                  <p>Well Groomed</p>
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-icon" style="background: #f72585">
+                  <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="card-info">
+                  <h3 id="violations">0</h3>
+                  <p>Violations Today</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="recent-activity">
+              <h3><i class="fas fa-history"></i> Recent Activity</h3>
+              <div id="activity-list" style="margin-top: 1rem">
+                <p>Loading activities...</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Live Camera Tab -->
+          <div id="camera" class="tab-content">
+            <h2><i class="fas fa-camera"></i> Live Camera Monitoring</h2>
+            <div class="camera-container">
+              <div class="video-wrapper">
+                <img id="video-feed" src="" alt="Live Camera Feed" />
+                <div class="video-placeholder">
+                  <i
+                    class="fas fa-camera"
+                    style="font-size: 4rem; margin-bottom: 1rem"
+                  ></i>
+                  <p>Camera feed will appear here</p>
+                  <p class="small">Click "Start Camera" to begin</p>
+                </div>
+              </div>
+
+              <div class="camera-controls">
+                <button id="start-camera" class="btn btn-primary">
+                  <i class="fas fa-play"></i> Start Camera
+                </button>
+                <button id="stop-camera" class="btn btn-danger" disabled>
+                  <i class="fas fa-stop"></i> Stop Camera
+                </button>
+                <button id="capture-frame" class="btn btn-success" disabled>
+                  <i class="fas fa-camera"></i> Capture & Analyze
+                </button>
+              </div>
+
+              <div class="live-results">
+                <h3>Live Analysis Results</h3>
+                <div id="live-analysis">
+                  <p>
+                    No analysis yet. Start camera and capture frame to see
+                    results.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Upload Photo Tab -->
+          <div id="upload" class="tab-content">
+            <h2><i class="fas fa-upload"></i> Upload Student Photo</h2>
+            <div class="upload-container">
+              <div class="upload-area" id="drop-area">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <h3>Drag & Drop Photo Here</h3>
+                <p>or click to browse</p>
+                <input
+                  type="file"
+                  id="file-input"
+                  accept="image/*"
+                  style="display: none"
+                />
+                <button id="browse-button" class="btn btn-primary">
+                  <i class="fas fa-folder-open"></i> Browse Files
+                </button>
+              </div>
+
+              <div class="preview-container">
+                <div class="image-preview">
+                  <h4>Uploaded Image</h4>
+                  <img
+                    id="uploaded-image"
+                    src=""
+                    alt="Uploaded Image"
+                    style="display: none"
+                  />
+                  <div id="image-placeholder">
+                    <i
+                      class="fas fa-image"
+                      style="font-size: 3rem; color: #6c757d"
+                    ></i>
+                    <p>Image will appear here</p>
+                  </div>
+                </div>
+                <div class="results-container">
+                  <h4>Analysis Results</h4>
+                  <div id="upload-results">
+                    <p style="color: #6c757d">
+                      Upload an image to see analysis results
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Students Tab -->
+          <div id="students" class="tab-content">
+            <h2><i class="fas fa-users"></i> Student Management</h2>
+            <div
+              style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 1.5rem;
+              "
+            >
+              <button id="add-student-btn" class="btn btn-primary">
+                <i class="fas fa-user-plus"></i> Add New Student
+              </button>
+              <div style="position: relative; width: 300px">
+                <input
+                  type="text"
+                  id="search-student"
+                  placeholder="Search students..."
+                  style="
+                    width: 100%;
+                    padding: 0.75rem;
+                    border: 1px solid #ced4da;
+                    border-radius: 5px;
+                  "
+                />
+                <i
+                  class="fas fa-search"
+                  style="
+                    position: absolute;
+                    right: 10px;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    color: #6c757d;
+                  "
+                ></i>
+              </div>
+            </div>
+
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Student ID</th>
+                    <th>Name</th>
+                    <th>Class</th>
+                    <th>Roll No</th>
+                    <th>Registered Date</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="students-table">
+                  <!-- Students will be loaded here -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Attendance Tab -->
+          <!-- <div id="attendance" class="tab-content">
+            <h2><i class="fas fa-clipboard-check"></i> Attendance</h2>
+            <div style="margin-bottom: 1.5rem">
+              <input
+                type="date"
+                id="attendance-date"
+                style="
+                  padding: 0.75rem;
+                  border: 1px solid #ced4da;
+                  border-radius: 5px;
+                "
+              />
+              <button
+                id="load-attendance"
+                class="btn btn-primary"
+                style="margin-left: 1rem"
+              >
+                <i class="fas fa-sync"></i> Load Attendance
+              </button>
+            </div>
+
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Student ID</th>
+                    <th>Name</th>
+                    <th>Class</th>
+                    <th>Status</th>
+                    <th>Check-in Time</th>
+                    <th>Grooming</th>
+                    <th>Uniform</th>
+                    <th>Violations</th>
+                  </tr>
+                </thead>
+                <tbody id="attendance-table"> -->
+          <!-- Attendance will be loaded here -->
+          <!-- </tbody>
+              </table>
+            </div>
+          </div> -->
+
+          <!-- Reports Tab -->
+          <!-- <div id="reports" class="tab-content">
+            <h2><i class="fas fa-chart-bar"></i> Reports</h2>
+            <div
+              style="
+                display: flex;
+                gap: 1rem;
+                margin-bottom: 1.5rem;
+                flex-wrap: wrap;
+              "
+            >
+              <div>
+                <label>Start Date:</label>
+                <input type="date" id="report-start" />
+              </div>
+              <div>
+                <label>End Date:</label>
+                <input type="date" id="report-end" />
+              </div>
+              <button id="generate-report" class="btn btn-primary">
+                <i class="fas fa-chart-line"></i> Generate Report
+              </button>
+            </div>
+
+            <div id="report-results">
+              <p>Select date range and generate report</p>
+            </div>
+          </div> -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Add Student Modal -->
+    <!-- Add Student Modal with Camera -->
+    <div id="add-student-modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3><i class="fas fa-user-plus"></i> Add New Student</h3>
+          <span class="close-modal">&times;</span>
+        </div>
+        <div class="modal-body">
+          <div class="modal-tabs">
+            <button class="tab-btn active" data-tab="student-info">
+              Student Info
+            </button>
+            <button class="tab-btn" data-tab="capture-photo">
+              Capture Photo
+            </button>
+          </div>
+
+          <div id="student-info-tab" class="tab-pane active">
+            <form id="add-student-form">
+              <div class="form-group">
+                <label for="modal-student-id">Student ID *</label>
+                <input
+                  type="text"
+                  id="modal-student-id"
+                  required
+                  placeholder="e.g., S001"
+                  autocomplete="off"
+                />
+              </div>
+              <div class="form-group">
+                <label for="modal-student-name">Full Name *</label>
+                <input
+                  type="text"
+                  id="modal-student-name"
+                  required
+                  placeholder="e.g., John Doe"
+                  autocomplete="off"
+                />
+              </div>
+              <div class="form-group">
+                <label for="modal-student-class">Class *</label>
+                <input
+                  type="text"
+                  id="modal-student-class"
+                  required
+                  placeholder="e.g., II"
+                  autocomplete="off"
+                />
+              </div>
+              <div class="form-group">
+                <label for="modal-student-roll">Roll Number</label>
+                <input
+                  type="number"
+                  id="modal-student-roll"
+                  placeholder="e.g., 1"
+                  min="1"
+                  autocomplete="off"
+                />
+              </div>
+              <div class="form-group">
+                <label for="modal-student-phone">Parent Phone</label>
+                <input
+                  type="tel"
+                  id="modal-student-phone"
+                  placeholder="9876543210"
+                  autocomplete="off"
+                />
+              </div>
+              <div class="form-group">
+                <label for="modal-student-email">Parent Email</label>
+                <input
+                  type="email"
+                  id="modal-student-email"
+                  placeholder="parent@email.com"
+                  autocomplete="off"
+                />
+              </div>
+
+              <div class="form-actions">
+                <button type="button" class="btn btn-secondary close-modal">
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-primary next-tab"
+                  data-next="capture-photo"
+                >
+                  <i class="fas fa-camera"></i> Next: Capture Photo
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <div id="capture-photo-tab" class="tab-pane">
+            <div class="camera-instructions">
+              <h4><i class="fas fa-info-circle"></i> Instructions</h4>
+              <ul>
+                <li>Make sure the student is facing the camera directly</li>
+                <li>Ensure good lighting on the face</li>
+                <li>Remove glasses if possible</li>
+                <li>Keep a neutral expression</li>
+              </ul>
+            </div>
+
+            <div class="camera-container-modal">
+              <div class="video-wrapper-modal">
+                <img id="modal-video-feed" src="" alt="Camera Feed" />
+                <div
+                  class="video-placeholder-modal"
+                  id="modal-camera-placeholder"
+                >
+                  <i
+                    class="fas fa-camera"
+                    style="font-size: 3rem; margin-bottom: 1rem"
+                  ></i>
+                  <p>Click "Start Camera" to begin</p>
+                </div>
+                <div class="face-overlay" id="face-overlay">
+                  <div class="face-guide"></div>
+                  <p>Align face within the guide</p>
+                </div>
+              </div>
+
+              <div class="camera-controls-modal">
+                <button id="modal-start-camera" class="btn btn-primary">
+                  <i class="fas fa-play"></i> Start Camera
+                </button>
+                <button id="modal-stop-camera" class="btn btn-danger" disabled>
+                  <i class="fas fa-stop"></i> Stop Camera
+                </button>
+                <button
+                  id="modal-capture-photo"
+                  class="btn btn-success"
+                  disabled
+                >
+                  <i class="fas fa-camera"></i> Capture Photo
+                </button>
+                <button
+                  id="modal-retake-photo"
+                  class="btn btn-warning"
+                  style="display: none"
+                >
+                  <i class="fas fa-redo"></i> Retake
+                </button>
+              </div>
+
+              <div
+                class="photo-preview"
+                id="photo-preview"
+                style="display: none"
+              >
+                <h4>Captured Photo</h4>
+                <img id="captured-photo" src="" alt="Captured Photo" />
+                <p class="photo-status" id="photo-status"></p>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button
+                type="button"
+                class="btn btn-secondary prev-tab"
+                data-prev="student-info"
+              >
+                <i class="fas fa-arrow-left"></i> Back to Info
+              </button>
+              <button
+                type="button"
+                class="btn btn-primary"
+                id="register-student"
+                disabled
+              >
+                <i class="fas fa-user-plus"></i> Register Student
+              </button>
+            </div>
+          </div>
+
+          <div
+            id="registration-success"
+            class="tab-pane"
+            style="display: none; text-align: center; padding: 2rem"
+          >
+            <i
+              class="fas fa-check-circle"
+              style="font-size: 4rem; color: #28a745; margin-bottom: 1rem"
+            ></i>
+            <h3>Student Registered Successfully!</h3>
+            <p>The student's face has been added to the recognition system.</p>
+            <button class="btn btn-primary close-modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Global variables
+      let currentTab = "dashboard";
+      let cameraActive = false;
+
+      // Initialize when page loads
+      document.addEventListener("DOMContentLoaded", function () {
+        console.log("🚀 Student Monitoring System Initialized");
+
+        // Update time
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+
+        // Setup tab switching
+        setupTabs();
+
+        // Setup file upload
+        setupFileUpload();
+
+        // Setup camera controls
+        setupCamera();
+
+        // Setup student management
+        setupStudentManagement();
+
+        // Load initial data
+        loadDashboardData();
+        loadStudents();
+        loadTodayAttendance();
+
+        // Check system status
+        checkSystemStatus();
+
+        console.log("✅ System ready!");
+      });
+
+      // Update date and time
+      function updateDateTime() {
+        const now = new Date();
+        document.getElementById("current-date").textContent =
+          now.toLocaleDateString("en-US", {
+            weekday: "long",
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          });
+        document.getElementById("current-time").textContent =
+          now.toLocaleTimeString("en-US", {
+            hour12: true,
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+          });
+      }
+
+      // Tab switching
+      function setupTabs() {
+        document.querySelectorAll(".sidebar li").forEach((tab) => {
+          tab.addEventListener("click", function () {
+            const tabId = this.dataset.tab;
+            switchTab(tabId);
+          });
+        });
+      }
+
+      function switchTab(tabId) {
+        // Update active tab
+        document.querySelectorAll(".sidebar li").forEach((tab) => {
+          tab.classList.remove("active");
+        });
+        document.querySelector(`[data-tab="${tabId}"]`).classList.add("active");
+
+        // Hide all tabs, show selected
+        document.querySelectorAll(".tab-content").forEach((content) => {
+          content.classList.remove("active");
+        });
+        document.getElementById(tabId).classList.add("active");
+
+        currentTab = tabId;
+
+        // Load tab-specific data
+        switch (tabId) {
+          case "dashboard":
+            loadDashboardData();
+            break;
+          case "students":
+            loadStudents();
+            break;
+          case "attendance":
+            loadTodayAttendance();
+            break;
+        }
+
+        showToast(`Switched to ${tabId}`, "info");
+      }
+
+      // File upload
+      function setupFileUpload() {
+        const dropArea = document.getElementById("drop-area");
+        const fileInput = document.getElementById("file-input");
+
+        // Click to browse
+        dropArea.addEventListener("click", () => fileInput.click());
+
+        // File selected
+        fileInput.addEventListener("change", handleFileSelect);
+
+        // Drag and drop
+        ["dragenter", "dragover", "dragleave", "drop"].forEach((event) => {
+          dropArea.addEventListener(event, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+
+        ["dragenter", "dragover"].forEach((event) => {
+          dropArea.addEventListener(event, () => {
+            dropArea.style.backgroundColor = "#f0f8ff";
+          });
+        });
+
+        ["dragleave", "drop"].forEach((event) => {
+          dropArea.addEventListener(event, () => {
+            dropArea.style.backgroundColor = "";
+          });
+        });
+
+        dropArea.addEventListener("drop", handleDrop);
+      }
+
+      function handleFileSelect(event) {
+        const file = event.target.files[0];
+        if (file) processFile(file);
+      }
+
+      function handleDrop(event) {
+        const file = event.dataTransfer.files[0];
+        if (file) processFile(file);
+      }
+
+      async function processFile(file) {
+        // Show preview
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const img = document.getElementById("uploaded-image");
+          img.src = e.target.result;
+          img.style.display = "block";
+          document.getElementById("image-placeholder").style.display = "none";
+        };
+        reader.readAsDataURL(file);
+
+        // Upload and analyze
+        const formData = new FormData();
+        formData.append("file", file);
+
+        try {
+          showLoading("upload");
+          const response = await fetch("/api/upload", {
+            method: "POST",
+            body: formData,
+          });
+
+          const result = await response.json();
+          displayUploadResults(result);
+          hideLoading("upload");
+        } catch (error) {
+          showToast("Upload failed: " + error.message, "error");
+          hideLoading("upload");
+        }
+      }
+
+      // function displayUploadResults(result) {
+      //   const container = document.getElementById("upload-results");
+
+      //   if (!result.success) {
+      //     container.innerHTML = `<div class="result-item has-issues">
+      //               <h4><i class="fas fa-exclamation-triangle"></i> Error</h4>
+      //               <p>${result.error}</p>
+      //           </div>`;
+      //     return;
+      //   }
+
+      //   if (result.faces_detected === 0) {
+      //     container.innerHTML = `<div class="result-item has-issues">
+      //               <h4><i class="fas fa-user-slash"></i> No Faces Detected</h4>
+      //               <p>No faces found in the image. Please upload a clear face photo.</p>
+      //           </div>`;
+      //     return;
+      //   }
+
+      //   let html = `<div class="result-item ${
+      //     result.results[0].has_issues ? "has-issues" : ""
+      //   }">
+      //           <h4><i class="fas fa-user"></i> Analysis Complete</h4>
+      //           <p><strong>Faces Detected:</strong> ${result.faces_detected}</p>
+      //           <p><strong>Student ID:</strong> ${
+      //             result.results[0].student_id
+      //           }</p>`;
+
+      //   const analysis = result.results[0].analysis;
+      //   const violations = result.results[0].violations;
+
+      //   // Display analysis
+      //   html += `<p><strong>Grooming Analysis:</strong></p>
+      //           <ul style="margin-left: 1rem;">
+      //               <li>Beard: ${analysis.beard ? "❌ YES" : "✅ NO"}</li>
+      //               <li>ID: ${analysis.ID ? "❌ MISSING" : "✅ PRESENT "}</li>
+      //               <li>Shoes: ${
+      //                 analysis.shoes ? "✅ PROPER" : "❌ SLIPPERS/WRONG"
+      //               }</li>
+      //               <li>Hair: ${
+      //                 analysis.hair_neat ? "✅ NEAT" : "❌ UNTIDY"
+      //               }</li>
+      //               <li>Uniform: ${
+      //                 analysis.uniform_proper ? "✅ PROPER" : "❌ IMPROPER"
+      //               }</li>
+      //           </ul>`;
+
+      // function displayUploadResults(result) {
+      //   const container = document.getElementById("upload-results");
+
+      //   if (!result.success) {
+      //     container.innerHTML = `<div class="result-item has-issues">
+      //               <h4><i class="fas fa-exclamation-triangle"></i> Error</h4>
+      //               <p>${result.error}</p>
+      //           </div>`;
+      //     return;
+      //   }
+
+      //   if (result.faces_detected === 0) {
+      //     container.innerHTML = `<div class="result-item has-issues">
+      //               <h4><i class="fas fa-user-slash"></i> No Faces Detected</h4>
+      //               <p>No faces found in the image. Please upload a clear face photo.</p>
+      //           </div>`;
+      //     return;
+      //   }
+
+      //   const analysis = result.results[0].analysis;
+      //   const violations = result.results[0].violations;
+      //   const aiAvailable =
+      //     result.results[0].combined_result?.ai_available || false;
+      //   const groomingResult = result.results[0].grooming_result;
+
+      //   let html = `<div class="result-item ${
+      //     result.results[0].has_issues ? "has-issues" : ""
+      //   }">
+      //           <h4><i class="fas fa-user"></i> Analysis Complete</h4>
+      //           <p><strong>Faces Detected:</strong> ${result.faces_detected}</p>
+      //           <p><strong>Student ID:</strong> ${
+      //             result.results[0].student_id
+      //           }</p>`;
+
+      //   // Show AI Status
+      //   if (aiAvailable) {
+      //     html += `<p><strong>AI Status:</strong> <span style="color: #28a745;">✓ Active</span></p>`;
+      //   } else {
+      //     html += `<p><strong>AI Status:</strong> <span style="color: #dc3545;">✗ Offline (Using Rule-based)</span></p>`;
+      //   }
+
+      //   // Display analysis
+      //   html += `<p><strong>Grooming Analysis:</strong></p>
+      //           <ul style="margin-left: 1rem;">
+      //               <li>Gender: ${analysis.gender}</li>
+      //               <li>Beard: ${analysis.beard ? "❌ YES" : "✅ NO"}</li>
+      //               <li>ID: ${
+      //                 analysis.ID === "Present"
+      //                   ? "✅ PRESENT"
+      //                   : analysis.ID === "Missing"
+      //                   ? "❌ MISSING"
+      //                   : "👁️ NOT VISIBLE"
+      //               }</li>
+      //               <li>Footwear: ${
+      //                 analysis.shoes === "Shoes"
+      //                   ? "✅ PROPER"
+      //                   : analysis.shoes === "Slippers"
+      //                   ? "❌ SLIPPERS"
+      //                   : "👁️ NOT VISIBLE"
+      //               }</li>
+      //               <li>Hair: ${
+      //                 analysis.hair_neat ? "✅ NEAT" : "❌ UNTIDY"
+      //               }</li>
+      //               <li>Uniform: ${
+      //                 analysis.uniform_proper ? "✅ PROPER" : "❌ IMPROPER"
+      //               }</li>
+      //           </ul>`;
+
+      //   //   // Display violations if any
+      //   //   if (violations.length > 0) {
+      //   //     html += `<p><strong>Violations Detected:</strong></p>`;
+      //   //     violations.forEach((violation) => {
+      //   //       html += `<span class="violation">${violation}</span>`;
+      //   //     });
+      //   //   } else {
+      //   //     html += `<p><strong>✅ All Good! No violations detected.</strong></p>`;
+      //   //   }
+
+      //   //   // Display your model's prediction
+      //   //   if (result.results[0].grooming_result) {
+      //   //     const grooming = result.results[0].grooming_result;
+      //   //     html += `<p><strong>AI Grooming Score:</strong> ${
+      //   //       grooming.label
+      //   //     } (${Math.round(grooming.confidence * 100)}% confidence)</p>`;
+      //   //   }
+
+      //   //   html += `</div>`;
+
+      //   //   // Show processed image
+      //   //   if (result.result_image) {
+      //   //     html += `<div class="result-item">
+      //   //               <h4><i class="fas fa-image"></i> Processed Image</h4>
+      //   //               <img src="${result.result_image}?t=${Date.now()}"
+      //   //                    style="max-width: 100%; border-radius: 5px; margin-top: 10px;">
+      //   //           </div>`;
+      //   //   }
+
+      //   //   container.innerHTML = html;
+      //   // }
+
+      //   // Display AI grooming score if available
+      //   if (groomingResult && groomingResult.label) {
+      //     const confidence = Math.round(groomingResult.confidence * 100);
+      //     html += `<p><strong>AI Grooming Score:</strong> ${groomingResult.label} (${confidence}% confidence)</p>`;
+
+      //     if (groomingResult.compliance_score) {
+      //       const compliance = Math.round(
+      //         groomingResult.compliance_score * 100
+      //       );
+      //       html += `<p><strong>Compliance Score:</strong> ${compliance}%</p>`;
+      //     }
+      //   }
+
+      //   // Display violations if any
+      //   if (violations.length > 0) {
+      //     html += `<p><strong>Violations Detected:</strong></p>`;
+      //     violations.forEach((violation) => {
+      //       html += `<span class="violation">${violation}</span>`;
+      //     });
+      //   } else {
+      //     html += `<p><strong>✅ All Good! No violations detected.</strong></p>`;
+      //   }
+
+      //   // Show AI detailed results if available
+      //   if (
+      //     result.results[0].ai_analysis &&
+      //     Object.keys(result.results[0].ai_analysis).length > 0
+      //   ) {
+      //     const ai = result.results[0].ai_analysis;
+      //     html += `<p><strong>AI Detailed Analysis:</strong></p>
+      //             <ul style="margin-left: 1rem; font-size: 0.9rem;">
+      //                 <li>Gender: ${ai.gender || "N/A"}</li>
+      //                 <li>Facial Hair: ${ai.facial_hair || "N/A"}</li>
+      //                 <li>Footwear: ${ai.footwear || "N/A"}</li>
+      //                 <li>Uniform: ${ai.uniform || "N/A"}</li>
+      //                 ${
+      //                   ai.compliance_score
+      //                     ? `<li>Compliance: ${Math.round(
+      //                         ai.compliance_score * 100
+      //                       )}%</li>`
+      //                     : ""
+      //                 }
+      //             </ul>`;
+      //   }
+
+      //   html += `</div>`;
+
+      //   // Show processed image
+      //   if (result.result_image) {
+      //     html += `<div class="result-item">
+      //               <h4><i class="fas fa-image"></i> Processed Image</h4>
+      //               <img src="${result.result_image}?t=${Date.now()}"
+      //                    style="max-width: 100%; border-radius: 5px; margin-top: 10px;">
+      //               <p><small>Face detection and analysis overlay</small></p>
+      //           </div>`;
+      //   }
+
+      //   container.innerHTML = html;
+      // }
+
+      function displayUploadResults(result) {
+        const container = document.getElementById("upload-results");
+
+        if (!result.success) {
+          container.innerHTML = `<div class="result-item has-issues">
+                <h4><i class="fas fa-exclamation-triangle"></i> Error</h4>
+                <p>${result.error}</p>
+            </div>`;
+          return;
+        }
+
+        if (result.faces_detected === 0) {
+          container.innerHTML = `<div class="result-item has-issues">
+                <h4><i class="fas fa-user-slash"></i> No Faces Detected</h4>
+                <p>No faces found in the image. Please upload a clear face photo.</p>
+            </div>`;
+          return;
+        }
+
+        const analysis = result.results[0].analysis;
+        const violations = result.results[0].violations;
+        const aiAvailable =
+          result.results[0].combined_result?.ai_available || false;
+        const groomingResult = result.results[0].grooming_result;
+        const gender = analysis.gender.toLowerCase();
+
+        let html = `<div class="result-item ${
+          result.results[0].has_issues ? "has-issues" : ""
+        }">
+            <h4><i class="fas fa-user"></i> Analysis Complete</h4>
+            <p><strong>Faces Detected:</strong> ${result.faces_detected}</p>
+            <p><strong>Student ID:</strong> ${result.results[0].student_id}</p>
+            <p><strong>Gender:</strong> <span class="gender-badge ${gender}">${analysis.gender.toUpperCase()}</span></p>`;
+
+        // Show AI Status
+        if (aiAvailable) {
+          html += `<p><strong>AI Status:</strong> <span style="color: #28a745;">✓ Active</span></p>`;
+        } else {
+          html += `<p><strong>AI Status:</strong> <span style="color: #dc3545;">✗ Offline (Using Rule-based)</span></p>`;
+        }
+
+        // Helper function to display footwear status
+        function getFootwearDisplay(shoesValue) {
+          if (shoesValue === "Shoes") {
+            return '<span style="color: #28a745;">✅ PROPER</span>';
+          } else if (shoesValue === "Slippers") {
+            return '<span style="color: #dc3545;">❌ IMPROPER</span>';
+          } else if (shoesValue === "Not Visible") {
+            return '<span style="color: #6c757d;">👁️ NOT VISIBLE</span>';
+          } else if (shoesValue === "Unknown") {
+            return '<span style="color: #ffc107;">⚠️ UNKNOWN</span>';
+          }
+          return `<span>${shoesValue}</span>`;
+        }
+
+        // Display analysis based on gender
+        html += `<p><strong>Grooming Analysis:</strong></p>
+            <ul style="margin-left: 1rem;">`;
+
+        if (gender === "male") {
+          // For male: Show all details
+          html += `
+            <li>Beard: ${analysis.beard ? "❌ YES" : "✅ NO"}</li>
+            <li>ID: ${
+              analysis.ID === "Present"
+                ? "✅ PRESENT"
+                : analysis.ID === "Missing"
+                ? "❌ MISSING"
+                : "👁️ NOT VISIBLE"
+            }</li>
+            <li>Footwear: ${getFootwearDisplay(analysis.shoes)}</li>
+            <li>Hair: ${analysis.hair_neat ? "✅ NEAT" : "❌ UNTIDY"}</li>
+            <li>Uniform: ${
+              analysis.uniform_proper ? "✅ PROPER" : "❌ IMPROPER"
+            }</li>
+        `;
+        } else if (gender === "female") {
+          // For female: Only show ID, Footwear, Dress code
+          html += `
+            <li>ID: ${
+              analysis.ID === "Present"
+                ? "✅ PRESENT"
+                : analysis.ID === "Missing"
+                ? "❌ MISSING"
+                : "👁️ NOT VISIBLE"
+            }</li>
+            <li>Footwear: ${getFootwearDisplay(analysis.shoes)}</li>
+            <li>Uniform: ${
+              analysis.uniform_proper ? "✅ PROPER" : "❌ IMPROPER"
+            }</li>
+        `;
+        } else {
+          // For unknown gender: Show all but beard
+          html += `
+            <li>ID: ${
+              analysis.ID === "Present"
+                ? "✅ PRESENT"
+                : analysis.ID === "Missing"
+                ? "❌ MISSING"
+                : "👁️ NOT VISIBLE"
+            }</li>
+            <li>Footwear: ${getFootwearDisplay(analysis.shoes)}</li>
+            <li>Hair: ${analysis.hair_neat ? "✅ NEAT" : "❌ UNTIDY"}</li>
+            <li>Uniform: ${
+              analysis.uniform_proper ? "✅ PROPER" : "❌ IMPROPER"
+            }</li>
+        `;
+        }
+
+        html += `</ul>`;
+
+        // Add image quality warning if footwear is "Unknown" or "Not Visible"
+        if (analysis.shoes === "Unknown" || analysis.shoes === "Not Visible") {
+          html += `<div style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 5px; padding: 10px; margin: 10px 0;">
+                    <i class="fas fa-exclamation-triangle" style="color: #ffc107;"></i>
+                    <strong>Image Quality Note:</strong> For better footwear detection, please ensure:
+                    <ul style="margin: 5px 0 0 20px; font-size: 0.9em;">
+                        <li>The full body is visible in the image</li>
+                        <li>Feet are clearly visible</li>
+                        <li>Good lighting on the lower body</li>
+                        <li>No obstructions covering the feet</li>
+                    </ul>
+                </div>`;
+        }
+
+        // Display AI grooming score if available
+        if (groomingResult && groomingResult.label) {
+          const confidence = Math.round(groomingResult.confidence * 100);
+
+          // Show gender-specific AI results
+          if (groomingResult.gender_prediction) {
+            const aiGender =
+              groomingResult.gender_prediction.label || "Unknown";
+            const aiGenderConfidence = Math.round(
+              groomingResult.gender_prediction.confidence * 100
+            );
+            html += `<p><strong>AI Gender Detection:</strong> ${aiGender.toUpperCase()} (${aiGenderConfidence}% confidence)</p>`;
+          }
+
+          html += `<p><strong>AI Grooming Score:</strong> ${groomingResult.label} (${confidence}% confidence)</p>`;
+
+          if (groomingResult.compliance_score) {
+            const compliance = Math.round(
+              groomingResult.compliance_score * 100
+            );
+            html += `<p><strong>Compliance Score:</strong> ${compliance}%</p>`;
+          }
+        }
+
+        // Display violations if any
+        if (violations.length > 0) {
+          // Filter violations based on gender
+          let filteredViolations = violations;
+          if (gender === "female") {
+            // Remove beard-related violations for females
+            filteredViolations = violations.filter(
+              (v) =>
+                !v.toLowerCase().includes("beard") &&
+                !v.toLowerCase().includes("facial hair")
+            );
+          }
+
+          // Also filter out "Footwear: Unknown" violations as they're not actual violations
+          filteredViolations = filteredViolations.filter(
+            (v) =>
+              !v.includes("Footwear: Unknown") && !v.includes("Check footwear")
+          );
+
+          if (filteredViolations.length > 0) {
+            html += `<p><strong>Violations Detected:</strong></p>`;
+            filteredViolations.forEach((violation) => {
+              html += `<span class="violation">${violation}</span>`;
+            });
+          } else {
+            html += `<p><strong>✅ All Good! No violations detected.</strong></p>`;
+          }
+        } else {
+          html += `<p><strong>✅ All Good! No violations detected.</strong></p>`;
+        }
+
+        // Show AI detailed results if available - gender-specific
+        if (
+          result.results[0].ai_analysis &&
+          Object.keys(result.results[0].ai_analysis).length > 0
+        ) {
+          const ai = result.results[0].ai_analysis;
+          html += `<p><strong>AI Detailed Analysis:</strong></p>
+                <ul style="margin-left: 1rem; font-size: 0.9rem;">`;
+
+          // Show gender-specific AI details
+          if (ai.gender) {
+            html += `<li>Gender: <span class="gender-badge ${ai.gender.toLowerCase()}">${ai.gender.toUpperCase()}</span></li>`;
+          }
+
+          // Only show facial hair for males
+          if (gender === "male" && ai.facial_hair) {
+            html += `<li>Facial Hair: ${ai.facial_hair}</li>`;
+          }
+
+          // Always show footwear and uniform
+          // if (ai.footwear) {
+          //   html += `<li>Footwear: ${ai.footwear}</li>`;
+          // }
+
+          if (ai.uniform) {
+            html += `<li>Uniform: ${ai.uniform}</li>`;
+          }
+
+          // Only show hair neatness for both genders (but could be hidden for females if needed)
+          if (gender !== "female" && ai.hair) {
+            html += `<li>Hair: ${ai.hair}</li>`;
+          }
+
+          if (ai.compliance_score) {
+            html += `<li>Compliance: ${Math.round(
+              ai.compliance_score * 100
+            )}%</li>`;
+          }
+
+          html += `</ul>`;
+        }
+
+        html += `</div>`;
+
+        // Show processed image
+        if (result.result_image) {
+          html += `<div class="result-item">
+                <h4><i class="fas fa-image"></i> Processed Image</h4>
+                <img src="${result.result_image}?t=${Date.now()}" 
+                     style="max-width: 100%; border-radius: 5px; margin-top: 10px;">
+                <p><small>Face detection and analysis overlay</small></p>
+            </div>`;
+        }
+
+        container.innerHTML = html;
+      }
+
+      // function displayUploadResults(result) {
+      //   const container = document.getElementById("upload-results");
+
+      //   if (!result.success) {
+      //     container.innerHTML = `<div class="result-item has-issues">
+      //           <h4><i class="fas fa-exclamation-triangle"></i> Error</h4>
+      //           <p>${result.error}</p>
+      //       </div>`;
+      //     return;
+      //   }
+
+      //   if (result.faces_detected === 0) {
+      //     container.innerHTML = `<div class="result-item has-issues">
+      //           <h4><i class="fas fa-user-slash"></i> No Faces Detected</h4>
+      //           <p>No faces found in the image. Please upload a clear face photo.</p>
+      //       </div>`;
+      //     return;
+      //   }
+
+      //   const analysis = result.results[0].analysis;
+      //   const violations = result.results[0].violations;
+      //   const aiAvailable =
+      //     result.results[0].combined_result?.ai_available || false;
+      //   const groomingResult = result.results[0].grooming_result;
+      //   const gender = analysis.gender.toLowerCase();
+
+      //   let html = `<div class="result-item ${
+      //     result.results[0].has_issues ? "has-issues" : ""
+      //   }">
+      //       <h4><i class="fas fa-user"></i> Analysis Complete</h4>
+      //       <p><strong>Faces Detected:</strong> ${result.faces_detected}</p>
+      //       <p><strong>Student ID:</strong> ${result.results[0].student_id}</p>
+      //       <p><strong>Gender:</strong> <span class="gender-badge ${gender}">${analysis.gender.toUpperCase()}</span></p>`;
+
+      //   // Show AI Status
+      //   if (aiAvailable) {
+      //     html += `<p><strong>AI Status:</strong> <span style="color: #28a745;">✓ Active</span></p>`;
+      //   } else {
+      //     html += `<p><strong>AI Status:</strong> <span style="color: #dc3545;">✗ Offline (Using Rule-based)</span></p>`;
+      //   }
+
+      //   // Display analysis based on gender
+      //   html += `<p><strong>Grooming Analysis:</strong></p>
+      //       <ul style="margin-left: 1rem;">`;
+
+      //   if (gender === "male") {
+      //     // For male: Show all details
+      //     html += `
+      //       <li>Beard: ${analysis.beard ? "❌ YES" : "✅ NO"}</li>
+      //       <li>ID: ${
+      //         analysis.ID === "Present"
+      //           ? "✅ PRESENT"
+      //           : analysis.ID === "Missing"
+      //           ? "❌ MISSING"
+      //           : "👁️ NOT VISIBLE"
+      //       }</li>
+      //       <li>Footwear: ${
+      //         analysis.shoes === "Shoes"
+      //           ? "✅ PROPER"
+      //           : analysis.shoes === "Slippers"
+      //           ? "❌ SLIPPERS"
+      //           : "👁️ NOT VISIBLE"
+      //       }</li>
+      //       <li>Hair: ${analysis.hair_neat ? "✅ NEAT" : "❌ UNTIDY"}</li>
+      //       <li>Uniform: ${
+      //         analysis.uniform_proper ? "✅ PROPER" : "❌ IMPROPER"
+      //       }</li>
+      //   `;
+      //   } else if (gender === "female") {
+      //     // For female: Only show ID, Footwear, Dress code
+      //     html += `
+      //       <li>ID: ${
+      //         analysis.ID === "Present"
+      //           ? "✅ PRESENT"
+      //           : analysis.ID === "Missing"
+      //           ? "❌ MISSING"
+      //           : "👁️ NOT VISIBLE"
+      //       }</li>
+      //       <li>Footwear: ${
+      //         analysis.shoes === "Shoes"
+      //           ? "✅ PROPER"
+      //           : analysis.shoes === "Slippers"
+      //           ? "❌ SLIPPERS"
+      //           : "👁️ NOT VISIBLE"
+      //       }</li>
+      //       <li>Uniform: ${
+      //         analysis.uniform_proper ? "✅ PROPER" : "❌ IMPROPER"
+      //       }</li>
+      //   `;
+      //   } else {
+      //     // For unknown gender: Show all but beard
+      //     html += `
+      //       <li>ID: ${
+      //         analysis.ID === "Present"
+      //           ? "✅ PRESENT"
+      //           : analysis.ID === "Missing"
+      //           ? "❌ MISSING"
+      //           : "👁️ NOT VISIBLE"
+      //       }</li>
+      //       <li>Footwear: ${
+      //         analysis.shoes === "Shoes"
+      //           ? "✅ PROPER"
+      //           : analysis.shoes === "Slippers"
+      //           ? "❌ SLIPPERS"
+      //           : "👁️ NOT VISIBLE"
+      //       }</li>
+      //       <li>Hair: ${analysis.hair_neat ? "✅ NEAT" : "❌ UNTIDY"}</li>
+      //       <li>Uniform: ${
+      //         analysis.uniform_proper ? "✅ PROPER" : "❌ IMPROPER"
+      //       }</li>
+      //   `;
+      //   }
+
+      //   html += `</ul>`;
+
+      //   // Display AI grooming score if available
+      //   if (groomingResult && groomingResult.label) {
+      //     const confidence = Math.round(groomingResult.confidence * 100);
+
+      //     // Show gender-specific AI results
+      //     if (groomingResult.gender_prediction) {
+      //       const aiGender =
+      //         groomingResult.gender_prediction.label || "Unknown";
+      //       const aiGenderConfidence = Math.round(
+      //         groomingResult.gender_prediction.confidence * 100
+      //       );
+      //       html += `<p><strong>AI Gender Detection:</strong> ${aiGender.toUpperCase()} (${aiGenderConfidence}% confidence)</p>`;
+      //     }
+
+      //     html += `<p><strong>AI Grooming Score:</strong> ${groomingResult.label} (${confidence}% confidence)</p>`;
+
+      //     if (groomingResult.compliance_score) {
+      //       const compliance = Math.round(
+      //         groomingResult.compliance_score * 100
+      //       );
+      //       html += `<p><strong>Compliance Score:</strong> ${compliance}%</p>`;
+      //     }
+      //   }
+
+      //   // Display violations if any
+      //   if (violations.length > 0) {
+      //     // Filter violations based on gender
+      //     let filteredViolations = violations;
+      //     if (gender === "female") {
+      //       // Remove beard-related violations for females
+      //       filteredViolations = violations.filter(
+      //         (v) =>
+      //           !v.toLowerCase().includes("beard") &&
+      //           !v.toLowerCase().includes("facial hair")
+      //       );
+      //     }
+
+      //     if (filteredViolations.length > 0) {
+      //       html += `<p><strong>Violations Detected:</strong></p>`;
+      //       filteredViolations.forEach((violation) => {
+      //         html += `<span class="violation">${violation}</span>`;
+      //       });
+      //     } else {
+      //       html += `<p><strong>✅ All Good! No violations detected.</strong></p>`;
+      //     }
+      //   } else {
+      //     html += `<p><strong>✅ All Good! No violations detected.</strong></p>`;
+      //   }
+
+      //   // Show AI detailed results if available - gender-specific
+      //   if (
+      //     result.results[0].ai_analysis &&
+      //     Object.keys(result.results[0].ai_analysis).length > 0
+      //   ) {
+      //     const ai = result.results[0].ai_analysis;
+      //     html += `<p><strong>AI Detailed Analysis:</strong></p>
+      //           <ul style="margin-left: 1rem; font-size: 0.9rem;">`;
+
+      //     // Show gender-specific AI details
+      //     if (ai.gender) {
+      //       html += `<li>Gender: <span class="gender-badge ${ai.gender.toLowerCase()}">${ai.gender.toUpperCase()}</span></li>`;
+      //     }
+
+      //     // Only show facial hair for males
+      //     if (gender === "male" && ai.facial_hair) {
+      //       html += `<li>Facial Hair: ${ai.facial_hair}</li>`;
+      //     }
+
+      //     // Always show footwear and uniform
+      //     if (ai.footwear) {
+      //       html += `<li>Footwear: ${ai.footwear}</li>`;
+      //     }
+
+      //     if (ai.uniform) {
+      //       html += `<li>Uniform: ${ai.uniform}</li>`;
+      //     }
+
+      //     // Only show hair neatness for both genders (but could be hidden for females if needed)
+      //     if (gender !== "female" && ai.hair) {
+      //       html += `<li>Hair: ${ai.hair}</li>`;
+      //     }
+
+      //     if (ai.compliance_score) {
+      //       html += `<li>Compliance: ${Math.round(
+      //         ai.compliance_score * 100
+      //       )}%</li>`;
+      //     }
+
+      //     html += `</ul>`;
+      //   }
+
+      //   html += `</div>`;
+
+      //   // Show processed image
+      //   if (result.result_image) {
+      //     html += `<div class="result-item">
+      //           <h4><i class="fas fa-image"></i> Processed Image</h4>
+      //           <img src="${result.result_image}?t=${Date.now()}"
+      //                style="max-width: 100%; border-radius: 5px; margin-top: 10px;">
+      //           <p><small>Face detection and analysis overlay</small></p>
+      //       </div>`;
+      //   }
+
+      //   container.innerHTML = html;
+      // }
+
+      // Camera controls
+      function setupCamera() {
+        document
+          .getElementById("start-camera")
+          .addEventListener("click", startCamera);
+        document
+          .getElementById("stop-camera")
+          .addEventListener("click", stopCamera);
+        document
+          .getElementById("capture-frame")
+          .addEventListener("click", captureFrame);
+      }
+
+      async function startCamera() {
+        try {
+          const response = await fetch("/api/camera/start", { method: "POST" });
+          const result = await response.json();
+
+          if (result.success) {
+            cameraActive = true;
+            document.getElementById("start-camera").disabled = true;
+            document.getElementById("stop-camera").disabled = false;
+            document.getElementById("capture-frame").disabled = false;
+
+            // Start video feed
+            document.getElementById("video-feed").src =
+              "/video_feed?" + Date.now();
+            document.querySelector(".video-placeholder").style.display = "none";
+
+            showToast("Camera started successfully", "success");
+          }
+        } catch (error) {
+          showToast("Failed to start camera", "error");
+        }
+      }
+
+      async function stopCamera() {
+        try {
+          const response = await fetch("/api/camera/stop", { method: "POST" });
+          const result = await response.json();
+
+          if (result.success) {
+            cameraActive = false;
+            document.getElementById("start-camera").disabled = false;
+            document.getElementById("stop-camera").disabled = true;
+            document.getElementById("capture-frame").disabled = true;
+
+            // Stop video feed
+            document.getElementById("video-feed").src = "";
+            document.querySelector(".video-placeholder").style.display = "flex";
+
+            showToast("Camera stopped", "info");
+          }
+        } catch (error) {
+          showToast("Failed to stop camera", "error");
+        }
+      }
+
+      async function captureFrame() {
+        try {
+          const response = await fetch("/api/camera/capture", {
+            method: "POST",
+          });
+          const result = await response.json();
+
+          displayCaptureResults(result);
+        } catch (error) {
+          showToast("Failed to capture frame", "error");
+        }
+      }
+
+      function displayCaptureResults(result) {
+        const container = document.getElementById("live-analysis");
+
+        if (!result.success) {
+          container.innerHTML = `<p style="color: #dc3545;">${result.error}</p>`;
+          return;
+        }
+
+        if (result.faces_detected === 0) {
+          container.innerHTML = `<p>No faces detected in the frame.</p>`;
+          return;
+        }
+
+        const analysis = result.results[0].analysis;
+        const violations = result.results[0].violations;
+
+        let html = `<div class="result-item ${
+          violations.length > 0 ? "has-issues" : ""
+        }">
+                <h4><i class="fas fa-user"></i> Live Analysis</h4>
+                <p><strong>Student:</strong> ${result.results[0].student_id}</p>
+                <p><strong>Findings:</strong></p>
+                <ul>`;
+
+        html += `<li>Beard: ${analysis.beard ? "❌ YES" : "✅ NO"}</li>`;
+        html += `<li>ID: ${analysis.ID ? "❌ MISSING" : "✅ PRESENT"}</li>`;
+        html += `<li>Shoes: ${
+          analysis.shoes ? "✅ PROPER" : "❌ SLIPPERS"
+        }</li>`;
+        html += `<li>Hair: ${
+          analysis.hair_neat ? "✅ NEAT" : "❌ UNTIDY"
+        }</li>`;
+        html += `<li>Uniform: ${
+          analysis.uniform_proper ? " ❌ IMPROPER" : "✅ PROPER"
+        }</li>`;
+
+        html += `</ul>`;
+
+        if (violations.length > 0) {
+          html += `<p><strong>Violations:</strong></p>`;
+          violations.forEach((violation) => {
+            html += `<span class="violation">${violation}</span>`;
+          });
+        } else {
+          html += `<p><strong>✅ All requirements met!</strong></p>`;
+        }
+
+        html += `</div>`;
+
+        container.innerHTML = html;
+      }
+
+      // Student management
+      function setupStudentManagement() {
+        document
+          .getElementById("add-student-btn")
+          .addEventListener("click", showAddStudentModal);
+        document
+          .getElementById("add-student-form")
+          .addEventListener("submit", addStudent);
+        document
+          .getElementById("search-student")
+          .addEventListener("input", searchStudents);
+
+        // Modal close buttons
+        document.querySelectorAll(".close-modal").forEach((btn) => {
+          btn.addEventListener("click", closeModal);
+        });
+      }
+
+      function showAddStudentModal() {
+        document.getElementById("add-student-modal").classList.add("active");
+      }
+
+      function closeModal() {
+        document.getElementById("add-student-modal").classList.remove("active");
+      }
+
+      async function addStudent(event) {
+        event.preventDefault();
+
+        const studentData = {
+          student_id: document.getElementById("modal-student-id").value,
+          name: document.getElementById("modal-student-name").value,
+          class: document.getElementById("modal-student-class").value,
+          roll_number:
+            parseInt(document.getElementById("modal-student-roll").value) || 0,
+        };
+
+        try {
+          const response = await fetch("/api/student/add", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(studentData),
+          });
+
+          const result = await response.json();
+
+          if (result.success) {
+            showToast("Student added successfully", "success");
+            closeModal();
+            document.getElementById("add-student-form").reset();
+            loadStudents();
+            loadDashboardData();
+          } else {
+            showToast(result.error, "error");
+          }
+        } catch (error) {
+          showToast("Failed to add student", "error");
+        }
+      }
+
+      async function deleteStudent(studentId) {
+        if (!confirm(`Are you sure you want to delete student ${studentId}?`))
+          return;
+
+        try {
+          const response = await fetch(`/api/student/delete/${studentId}`, {
+            method: "DELETE",
+          });
+
+          const result = await response.json();
+
+          if (result.success) {
+            showToast("Student deleted successfully", "success");
+            loadStudents();
+            loadDashboardData();
+          } else {
+            showToast(result.error, "error");
+          }
+        } catch (error) {
+          showToast("Failed to delete student", "error");
+        }
+      }
+
+      async function loadStudents() {
+        try {
+          const response = await fetch("/api/students");
+          const result = await response.json();
+
+          if (result.success) {
+            displayStudents(result.students);
+          }
+        } catch (error) {
+          console.error("Failed to load students:", error);
+        }
+      }
+
+      function displayStudents(students) {
+        const tbody = document.getElementById("students-table");
+
+        if (students.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 2rem;">No students found</td></tr>`;
+          return;
+        }
+
+        let html = "";
+        students.forEach((student) => {
+          html += `<tr>
+                    <td>${student.student_id}</td>
+                    <td>${student.name}</td>
+                    <td>${student.class}</td>
+                    <td>${student.roll_number || ""}</td>
+                    <td>${new Date(
+                      student.registered_date
+                    ).toLocaleDateString()}</td>
+                    <td>
+                        <button onclick="deleteStudent('${
+                          student.student_id
+                        }')" 
+                                class="btn btn-danger" style="padding: 0.25rem 0.5rem; font-size: 0.875rem;">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </td>
+                </tr>`;
+        });
+
+        tbody.innerHTML = html;
+      }
+
+      function searchStudents() {
+        const searchTerm = document
+          .getElementById("search-student")
+          .value.toLowerCase();
+        const rows = document.querySelectorAll("#students-table tr");
+
+        rows.forEach((row) => {
+          const text = row.textContent.toLowerCase();
+          row.style.display = text.includes(searchTerm) ? "" : "none";
+        });
+      }
+
+      // Dashboard
+      async function loadDashboardData() {
+        try {
+          // Load students count
+          const studentsRes = await fetch("/api/students");
+          const studentsData = await studentsRes.json();
+
+          if (studentsData.success) {
+            document.getElementById("total-students").textContent =
+              studentsData.students.length;
+          }
+
+          // Load attendance
+          const attendanceRes = await fetch("/api/attendance/today");
+          const attendanceData = await attendanceRes.json();
+
+          if (attendanceData.success) {
+            const present = attendanceData.attendance.filter(
+              (a) => a.status === "Present"
+            ).length;
+            document.getElementById("present-today").textContent = present;
+
+            // Count violations (simplified)
+            let violations = 0;
+            attendanceData.attendance.forEach((a) => {
+              if (
+                a.grooming_status === "Poor" ||
+                a.uniform_status === "Improper"
+              ) {
+                violations++;
+              }
+            });
+            document.getElementById("violations").textContent = violations;
+
+            // Count well-groomed (simplified)
+            const wellGroomed = attendanceData.attendance.filter(
+              (a) =>
+                a.grooming_status === "Good" ||
+                a.grooming_status === "Excellent"
+            ).length;
+            document.getElementById("well-groomed").textContent = wellGroomed;
+          }
+        } catch (error) {
+          console.error("Failed to load dashboard data:", error);
+        }
+      }
+
+      // Attendance
+      async function loadTodayAttendance() {
+        try {
+          const response = await fetch("/api/attendance/today");
+          const result = await response.json();
+
+          if (result.success) {
+            displayAttendance(result.attendance);
+          }
+        } catch (error) {
+          console.error("Failed to load attendance:", error);
+        }
+      }
+
+      function displayAttendance(attendance) {
+        const tbody = document.getElementById("attendance-table");
+
+        if (!attendance || attendance.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 2rem;">No attendance records for today</td></tr>`;
+          return;
+        }
+
+        let html = "";
+        attendance.forEach((record) => {
+          const statusColor =
+            record.status === "Present" ? "#28a745" : "#dc3545";
+          const groomingColor =
+            record.grooming_status === "Good"
+              ? "#28a745"
+              : record.grooming_status === "Poor"
+              ? "#dc3545"
+              : "#ffc107";
+          const uniformColor =
+            record.uniform_status === "Proper" ? "#28a745" : "#dc3545";
+
+          html += `<tr>
+                    <td>${record.student_id || "N/A"}</td>
+                    <td>${record.name || "Unknown"}</td>
+                    <td>${record.class || ""}</td>
+                    <td><span style="color: ${statusColor}; font-weight: bold;">${
+            record.status || "Absent"
+          }</span></td>
+                    <td>${record.check_in || "-"}</td>
+                    <td><span style="color: ${groomingColor};">${
+            record.grooming_status || "N/A"
+          }</span></td>
+                    <td><span style="color: ${uniformColor};">${
+            record.uniform_status || "N/A"
+          }</span></td>
+                    <td>${record.violations || "None"}</td>
+                </tr>`;
+        });
+
+        tbody.innerHTML = html;
+      }
+
+      // System status
+      async function checkSystemStatus() {
+        try {
+          const response = await fetch("/api/system/status");
+          const result = await response.json();
+
+          if (result.success) {
+            if (!result.camera_available) {
+              document.getElementById("start-camera").disabled = true;
+              document.getElementById("start-camera").innerHTML =
+                '<i class="fas fa-exclamation-triangle"></i> Camera Not Available';
+            }
+
+            if (!result.model_loaded) {
+              showToast(
+                "AI Model not loaded - using basic analysis",
+                "warning"
+              );
+            }
+          }
+        } catch (error) {
+          console.error("Failed to check system status:", error);
+        }
+      }
+
+      // Utility functions
+      function showToast(message, type = "info") {
+        const toast = document.createElement("div");
+        toast.className = `toast ${type}`;
+        toast.innerHTML = `
+                <i class="fas fa-${
+                  type === "success"
+                    ? "check-circle"
+                    : type === "error"
+                    ? "exclamation-circle"
+                    : "info-circle"
+                }"></i>
+                <span>${message}</span>
+                <button onclick="this.parentElement.remove()" style="margin-left: auto; background: none; border: none; cursor: pointer;">×</button>
+            `;
+
+        document.body.appendChild(toast);
+
+        setTimeout(() => {
+          if (toast.parentElement) {
+            toast.remove();
+          }
+        }, 5000);
+      }
+
+      function showLoading(elementId) {
+        const element = document.getElementById(elementId);
+        if (element) {
+          element.style.opacity = "0.5";
+          element.style.pointerEvents = "none";
+        }
+      }
+
+      function hideLoading(elementId) {
+        const element = document.getElementById(elementId);
+        if (element) {
+          element.style.opacity = "1";
+          element.style.pointerEvents = "auto";
+        }
+      }
+    </script>
+  </body>
+</html>
